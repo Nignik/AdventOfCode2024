@@ -40,14 +40,7 @@ def check_page(page, rules):
 def sol1(file_name):
   rules_data, pages_data = load_data(file_name)
   
-  rules = {}
-  for rule in rules_data:
-    rule = rule.split('|')
-    if rule[0] not in rules.keys():
-      rules[rule[0]] = [rule[1]]
-    else:
-      rules[rule[0]].append(rule[1])
-  
+  rules = get_rules(rules_data)
   ans = []
   for page in pages_data:
     page = page.split(',')
@@ -56,11 +49,6 @@ def sol1(file_name):
       ans.append(page[len(page)//2])
   
   return sum(list(map(int, ans)))
-  
-def shift(lst, index, new_index):
-  new_index = max(0, new_index)
-  element = lst.pop(index)
-  lst.insert(new_index, element)
         
 def sol2(file_name):
   rules_data, pages_data = load_data(file_name)
