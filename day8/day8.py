@@ -19,34 +19,24 @@ def load_data(file_name):
 
   return res
 
-def sol1(file_name):
-  grid = load_data(file_name)
+def is_antinode1(A, B, P):
+  AB = B - A
+  PA = A - P
+  PB = B - P
+  if np.array_equal(AB, PA) or np.array_equal(-AB, PB):
+    return True
+  return False
+
+def is_antinode2(A, B, P):
+  AB = B - A
+  AP = P - A
   
-  antenas = defaultdict(list)
-  for r in range(len(grid)):
-    for c in range(len(grid[0])):
-      if grid[r][c] != '.':
-        antenas[grid[r][c]].append(np.array([r, c]))
-  
-  ans = set()
-  for ant in antenas.values():
-    for comb in combinations(ant, 2):
-      ab = comb[1] - comb[0]
-      for r in range(len(grid)):
-        for c in range(len(grid[0])):
-          p = np.array([r, c])
-          ca = comb[0] - p
-          cb = comb[1] - p
-          if np.array_equal(ab, ca) or np.array_equal(-ab, cb):
-            ans.add((r, c))
-  
-  return len(ans)
-              
-  
-    
-def sol2(file_name):
-  grid = load_data(file_name)
-  
+  cross_prod = AB[0]*AP[1] - AB[1]*AP[0]
+  if np.isclose(cross_prod, 0.0):
+      return True
+  return False
+
+def solve(grid, is_antinode):
   antenas = defaultdict(list)
   for r in range(len(grid)):
     for c in range(len(grid[0])):
@@ -60,15 +50,20 @@ def sol2(file_name):
         for c in range(len(grid[0])):
           A, B = comb[0], comb[1]
           P = np.array([r, c])
-          
-          AB = B - A
-          AP = P - A
-          
-          cross_prod = AB[0]*AP[1] - AB[1]*AP[0]
-          if np.isclose(cross_prod, 0.0):
-              ans.add((r, c))
-        
+          if is_antinode(A, B, P):
+            ans.add((r, c))
+            
   return len(ans)
+
+def sol1(file_name):
+  grid = load_data(file_name)
+  
+  return solve(grid, is_antinode1)
+              
+def sol2(file_name):
+  grid = load_data(file_name)
+  
+  return solve(grid, is_antinode2)
   
 
 print(f"Star 1:\n test: {sol1('day8/test.in')}\n answer: {sol1('day8/input.in')}\n")
