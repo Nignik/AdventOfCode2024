@@ -85,8 +85,8 @@ def sol2(file_name):
       cols = defaultdict(list)
       #LOG(file_name, perim)
       for x in perim:
-        rows[x[0]].append((x[1], x[2], x[3]))
-        cols[x[1]].append((x[0], x[2], x[3])) 
+        rows[(x[0], x[2], x[3])].append(x[1])
+        cols[(x[1], x[2], x[3])].append(x[0]) 
       for key in rows:
         rows[key].sort()
       for key in cols:
@@ -98,27 +98,10 @@ def sol2(file_name):
         LOG(file_name, cols)
       
       for y in [rows.values(), cols.values()]:
-        counted = set()
         for x in y:
-          same = set()
           for i in range(1, len(x)):
-            j = i
-            ok = False
-            while j < len(x) and x[j][0] == x[i-1][0] + 1:
-              if (x[j][1], x[j][2]) == (x[i-1][1], x[i-1][2]):
-                ok = True
-                break
-              j += 1
-              
-            if x[i][0] == x[i-1][0] + 1 and (ok or (x[i-1][0], x[i][1], x[i][2]) in same) and x[i] not in counted:
-              counted.add(x[i])
+            if x[i] == x[i-1] + 1:
               p -= 1
-            elif x[i][0] == x[i-1][0]:
-              same.add(x[i])
-              same.add(x[i-1])
-            
-            if x[i][0] != x[i-1][0]:
-              same = set()
             
       if len(area) != 0:
         LOG(file_name, f"{grid[r][c]}: {len(area)} x {p}")
