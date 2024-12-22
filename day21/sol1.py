@@ -98,37 +98,51 @@ def backtrack_paths(keypad, start, end, scores):
     return all_dir_paths
 
 def process_path(path, depth):
-    paths_sum = 0
+    final_path = []
+    prevEnd = dirMap['A']
     for ch in path:
-        paths = bfs(dirKey, dirMap['A'], dirMap[ch])
-        print(f"depth 1: {paths}")
-        best_path = float('inf')
-        if depth < 0:
+        paths = bfs(dirKey, prevEnd, dirMap[ch])
+        prevEnd = dirMap[ch]
+        #print(f"depth 1 stage 1: {paths}")
+        best_path = []
+        if depth < 1:
             for new_path in paths:
-                best_path = min(best_path, process_path(new_path, depth+1))
-            paths_sum += best_path
+                try_path = process_path(new_path + ['A'], depth+1)
+                if len(best_path) == 0 or len(try_path) < len(best_path):
+                    best_path = try_path
+            final_path += best_path
         else:
             for new_path in paths:
-                best_path = min(best_path, len(path))
-            paths_sum += best_path
+                if len(best_path) == 0 or len(new_path) < len(best_path):
+                    best_path = new_path
+            final_path += best_path + ['A']
     
-    return paths_sum
+    return final_path
 
 # Currently the program resets the robots to A after each press, which is not correct
 def sol(file_name):
     queries = load_data(file_name)
     
-    paths_sum = 0
-    for query in queries[:1]:
+    ans = 0
+    for query in queries:
+        prevEnd = (3, 2)
+        final_path = []
         for ch in query:
-            paths = bfs(numKey, (3, 2), numMap[ch])
-            print(f"depth 0: {paths}")
-            best_path = float('inf')
+            paths = bfs(numKey, prevEnd, numMap[ch])
+            prevEnd = numMap[ch]
+            #print(f"depth 0: {paths}")
+            best_path = []
             for path in paths:
-                best_path = min(best_path, process_path(path, 0))
-            paths_sum += best_path
+                processed_path = process_path(path + ['A'], 0)
+                if len(best_path) == 0 or len(best_path) > len(processed_path):
+                    best_path = processed_path
+            final_path += best_path
+        
+        #print(final_path)
+        ans += len(final_path) * int(query[:3])
+        #print(ans)
       
-    return paths_sum
+    return ans
   
 print(f"Test: {sol('test.in')}")
-#print(f"Answer: {sol('input.in')}\n")
+print(f"Answer: {sol('input.in')}\n")
